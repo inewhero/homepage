@@ -1,0 +1,88 @@
+---
+import type { MarkdownHeading } from 'astro';
+import 'katex/dist/katex.min.css';
+import { getDictionary } from '../i18n';
+import type { Locale } from '../lib/content';
+import { localizedPath } from '../lib/urls';
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  locale: Locale;
+  title: string;
+  description: string;
+  published: Date;
+  updated?: Date | undefined;
+  headings: MarkdownHeading[];
+  translationHref?: string | undefined;
+}
+
+const {
+  locale,
+  title,
+  description,
+  published,
+  updated,
+  headings,
+  translationHref,
+} = Astro.props;
+const copy = getDictionary(locale);
+const toc = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+const dateFormatter = new Intl.DateTimeFormat(locale === 'zh' ? 'zh-CN' : 'en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout
+  locale={locale}
+  title={title}
+  description={description}
+  active="notes"
+  translationHref={translationHref}
+  pageClass="document-page"
+>
+  <header class="document-header section-frame">
+    <a class="back-link" href={localizedPath(locale, '/notes/')}>
+      <span aria-hidden="true">←</span> {copy.notes.backToNotes}
+    </a>
+    <h1>{title}</h1>
+    <p class="document-description">{description}</p>
+    <div class="document-meta">
+      <p>
+        {copy.notes.published}
+        <time datetime={published.toISOString()}>{dateFormatter.format(published)}</time>
+      </p>
+      {
+        updated && (
+          <p>
+            {copy.notes.updated}
+            <time datetime={updated.toISOString()}>{dateFormatter.format(updated)}</time>
+          </p>
+        )
+      }
+    </div>
+  </header>
+
+  <details class="mobile-toc section-frame">
+    <summary>{copy.notes.tableOfContents}</summary>
+    <ol>
+      {toc.map((heading) => <li class={`depth-${heading.depth}`}><a href={`#${heading.slug}`}>{heading.text}</a></li>)}
+    </ol>
+  </details>
+
+  <div class="document-grid section-frame">
+    <aside class="desktop-toc" aria-label={copy.notes.tableOfContents}>
+      <p>{copy.notes.tableOfContents}</p>
+      <ol>
+        {toc.map((heading) => <li class={`depth-${heading.depth}`}><a href={`#${heading.slug}`}>{heading.text}</a></li>)}
+      </ol>
+    </aside>
+    <article class="prose">
+      <slot />
+    </article>
+    <div class="document-margin" aria-hidden="true">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,58 @@
+---
+import { getDictionary } from '../i18n';
+import type { NavKey } from '../i18n/types';
+import type { Locale } from '../lib/content';
+import { localizedPath } from '../lib/urls';
+
+interface Props {
+  locale: Locale;
+  active?: NavKey | undefined;
+  translationHref?: string | undefined;
+}
+
+const { locale, active, translationHref } = Astro.props;
+const copy = getDictionary(locale);
+const navItems: { key: NavKey; path: string }[] = [
+  { key: 'home', path: '/' },
+  { key: 'notes', path: '/notes/' },
+  { key: 'projects', path: '/projects/' },
+  { key: 'publications', path: '/publications/' },
+  { key: 'journey', path: '/journey/' },
+  { key: 'contact', path: '/contact/' },
+];
+---
+
+<header class="site-header">
+  <nav class="primary-nav" aria-label={locale === 'zh' ? '主要导航' : 'Primary navigation'}>
+    <div class="primary-nav-links">
+      {
+        navItems.map(({ key, path }) => (
+          <a
+            href={localizedPath(locale, path)}
+            class:list={{ "site-name-link": key === 'home', active: active === key }}
+            aria-current={active === key ? 'page' : undefined}
+          >
+            {key === 'home' ? 'Ruiyi Huang' : copy.nav[key]}
+          </a>
+        ))
+      }
+    </div>
+    {
+      translationHref ? (
+        <a
+          class="language-switch"
+          href={translationHref}
+          lang={locale === 'zh' ? 'en' : 'zh-Hans'}
+          data-locale-switch={locale === 'zh' ? 'en' : 'zh'}
+        >
+          {copy.switchLanguage}
+        </a>
+      ) : (
+        <span class="language-switch is-disabled" title={copy.notes.unavailable}>
+          {copy.switchLanguage}
+        </span>
+      )
+    }
+  </nav>
+  <span class="header-register" aria-hidden="true"></span>
+</header>

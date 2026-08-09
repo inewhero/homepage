@@ -1,0 +1,56 @@
+---
+import { getCollection } from 'astro:content';
+import { getDictionary } from '../i18n';
+import type { Locale } from '../lib/content';
+import { visibleNotes } from '../lib/content';
+import { localizedPath } from '../lib/urls';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getDictionary(locale);
+const allNotes = await getCollection('notes');
+const notes = visibleNotes(allNotes, locale);
+const otherLocale: Locale = locale === 'zh' ? 'en' : 'zh';
+const dateFormatter = new Intl.DateTimeFormat(locale === 'zh' ? 'zh-CN' : 'en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout
+  locale={locale}
+  title={copy.notes.indexTitle}
+  description={copy.notes.indexIntro}
+  active="notes"
+  translationHref={localizedPath(otherLocale, '/notes/')}
+  pageClass="notes-index-page"
+>
+  <section class="page-hero compact-page-hero notes-hero section-frame">
+    <h1>{copy.notes.indexTitle}</h1>
+  </section>
+
+  <section class="notes-list section-frame" aria-label={copy.notes.indexTitle}>
+    {
+      notes.map(({ entry, identity }) => (
+        <article class="doc-preview">
+          <div>
+            <h2>
+              <a href={localizedPath(locale, `/notes/${identity.slug}/`)}>{entry.data.title}</a>
+            </h2>
+            <p>{entry.data.description}</p>
+          </div>
+          <p class="doc-date">
+            <time datetime={entry.data.published.toISOString()}>
+              {dateFormatter.format(entry.data.published)}
+            </time>
+          </p>
+        </article>
+      ))
+    }
+  </section>
+</BaseLayout>

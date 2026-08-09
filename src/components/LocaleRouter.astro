@@ -1,0 +1,63 @@
+---
+import type { Locale } from '../lib/content';
+
+interface Props {
+  locale: Locale;
+  translationHref?: string | undefined;
+}
+
+const { locale, translationHref } = Astro.props;
+---
+
+<script
+  is:inline
+  define:vars={{ currentLocale: locale, alternateHref: translationHref }}
+>
+  (() => {
+    const preferenceKey = 'ruiyi-huang.locale';
+
+    const readPreference = () => {
+      try {
+        const value = window.localStorage.getItem(preferenceKey);
+        return value === 'zh' || value === 'en' ? value : undefined;
+      } catch {
+        return undefined;
+      }
+    };
+
+    const detectBrowserLocale = () => {
+      const language = navigator.languages?.[0] ?? navigator.language;
+      return language?.toLowerCase().startsWith('zh')
+        ? 'zh'
+        : 'en';
+    };
+
+    const preferredLocale = readPreference() ?? detectBrowserLocale();
+
+    if (currentLocale === 'en' && preferredLocale === 'zh' && alternateHref) {
+      const target = new URL(alternateHref, window.location.origin);
+      target.search = window.location.search;
+      target.hash = window.location.hash;
+      window.location.replace(target.href);
+      return;
+    }
+
+    document.addEventListener(
+      'click',
+      (event) => {
+        const element = event.target instanceof Element
+          ? event.target.closest('[data-locale-switch]')
+          : null;
+        const targetLocale = element?.getAttribute('data-locale-switch');
+        if (targetLocale !== 'zh' && targetLocale !== 'en') return;
+
+        try {
+          window.localStorage.setItem(preferenceKey, targetLocale);
+        } catch {
+          // The link still works when storage is unavailable.
+        }
+      },
+      { capture: true },
+    );
+  })();
+</script>

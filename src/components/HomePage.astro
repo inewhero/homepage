@@ -1,0 +1,66 @@
+---
+import { getDictionary } from '../i18n';
+import type { Locale } from '../lib/content';
+import { getFeaturedWorks } from '../lib/featured';
+import { localizedPath } from '../lib/urls';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getDictionary(locale);
+const otherLocale: Locale = locale === 'zh' ? 'en' : 'zh';
+const featured = await getFeaturedWorks(locale);
+---
+
+<BaseLayout
+  locale={locale}
+  active="home"
+  translationHref={localizedPath(otherLocale, '/')}
+  pageClass="home-page"
+>
+  <section class="hero section-frame" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <h1 id="hero-title" class="hero-welcome">
+        <span class="hero-welcome-lead">{copy.home.welcomeBefore}</span>
+        <span class="hero-welcome-name"><strong>{copy.home.name}</strong>{copy.home.welcomeAfter}</span>
+      </h1>
+      <p class="hero-headline">{copy.home.headline}</p>
+      <p class="hero-subheadline">{copy.home.subheadline}</p>
+      <span class="accent-rule" aria-hidden="true"></span>
+      <p class="hero-intro">{copy.home.intro}</p>
+    </div>
+  </section>
+
+  <section class="selected-work section-frame" aria-labelledby="selected-work-title">
+    <div class="section-heading-row">
+      <div>
+        <h2 id="selected-work-title">{featured.title}</h2>
+        <span class="sage-rule" aria-hidden="true"></span>
+      </div>
+    </div>
+
+    <div class="work-grid">
+      {
+        featured.items.map((work) => (
+          <article class="work-card">
+            <h3>{work.title}</h3>
+            <span class="card-rule" aria-hidden="true"></span>
+            <p class="work-meta">
+              <span>{work.year}</span>
+              <span aria-hidden="true">·</span>
+              <span>{work.venue}</span>
+            </p>
+            <a
+              class="card-link"
+              href={localizedPath(locale, work.href)}
+              aria-label={work.title}
+            />
+          </article>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

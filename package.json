@@ -1,0 +1,27 @@
+{
+  "name": "academic-homepage",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prepare:fonts": "node scripts/prepare-fonts.mjs",
+    "dev": "npm run prepare:fonts && astro dev",
+    "build": "npm run prepare:fonts && astro check && astro build",
+    "preview": "astro preview",
+    "check": "npm run prepare:fonts && astro check"
+  },
+  "dependencies": {
+    "@astrojs/markdown-remark": "7.2.2",
+    "@fontsource/lora": "5.3.0",
+    "@fontsource/noto-serif-sc": "5.3.0",
+    "@fontsource/source-sans-3": "5.3.0",
+    "astro": "7.1.6",
+    "katex": "0.18.1",
+    "rehype-katex": "7.0.1",
+    "remark-math": "6.0.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "typescript": "6.0.3"
+  }
+}

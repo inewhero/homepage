@@ -1,0 +1,11 @@
+node_modules/
+dist/
+canvas/
+.astro/
+.npm-cache/
+.playwright-cli/
+output/playwright/
+src/assets/fonts/generated/
+src/styles/fonts.generated.css
+.DS_Store
+*.log

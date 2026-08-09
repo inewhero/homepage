@@ -1,0 +1,52 @@
+---
+import { getDictionary } from '../i18n';
+import type { StandardPageKey } from '../i18n/types';
+import type { Locale } from '../lib/content';
+import { getSectionContent } from '../lib/sections';
+import { localizedPath } from '../lib/urls';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+interface Props {
+  locale: Locale;
+  section: StandardPageKey;
+}
+
+const { locale, section } = Astro.props;
+const copy = getDictionary(locale);
+const page = section === 'contact'
+  ? copy.pages.contact
+  : await getSectionContent(locale, section);
+const otherLocale: Locale = locale === 'zh' ? 'en' : 'zh';
+---
+
+<BaseLayout
+  locale={locale}
+  active={section}
+  title={page.title}
+  description={page.intro}
+  translationHref={localizedPath(otherLocale, `/${section}/`)}
+  pageClass={`section-page section-${section}`}
+>
+  <section class="page-hero compact-page-hero section-frame">
+    <h1>{page.title}</h1>
+  </section>
+
+  <section class="entry-list section-frame">
+    {
+      page.items.map((item) => (
+        <article class="entry-card">
+          <div class="entry-body">
+            {section === 'contact' && item.eyebrow && <p class="eyebrow">{item.eyebrow}</p>}
+            <h2>
+              {item.href ? (
+                <a href={item.href} target="_blank" rel="noreferrer">{item.title}</a>
+              ) : item.title}
+            </h2>
+            <p>{item.text}</p>
+            {item.meta && <p class="entry-meta">{item.meta}</p>}
+          </div>
+        </article>
+      ))
+    }
+  </section>
+</BaseLayout>

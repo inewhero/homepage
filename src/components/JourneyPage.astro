@@ -1,0 +1,62 @@
+---
+import type { Locale } from '../lib/content';
+import { getJourneyContent } from '../lib/journey';
+import { localizedPath } from '../lib/urls';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const journey = await getJourneyContent(locale);
+const otherLocale: Locale = locale === 'zh' ? 'en' : 'zh';
+---
+
+<BaseLayout
+  locale={locale}
+  active="journey"
+  title={journey.title}
+  description={journey.intro}
+  translationHref={localizedPath(otherLocale, '/journey/')}
+  pageClass="journey-page"
+>
+  <section class="page-hero compact-page-hero section-frame">
+    <h1>{journey.title}</h1>
+  </section>
+
+  <section class="journey-shell section-frame" aria-label={journey.title}>
+    <div class="journey-track-head" aria-hidden="true">
+      <p>{journey.academicLabel}</p>
+      <span></span>
+      <p>{journey.practicalLabel}</p>
+    </div>
+
+    <div class="journey-periods">
+      {
+        journey.periods.map((period) => (
+          <article class="journey-period" id={`period-${period.id}`}>
+            <div class="journey-entry journey-academic">
+              <p class="journey-track-label">{journey.academicLabel}</p>
+              <h2>{period.academic.title}</h2>
+              <p>{period.academic.text}</p>
+              {period.academic.meta && <p class="entry-meta">{period.academic.meta}</p>}
+            </div>
+
+            <div class="journey-axis" aria-label={period.year}>
+              <span class="journey-dot" aria-hidden="true"></span>
+              <time>{period.year}</time>
+            </div>
+
+            <div class="journey-entry journey-practical">
+              <p class="journey-track-label">{journey.practicalLabel}</p>
+              <h2>{period.practical.title}</h2>
+              <p>{period.practical.text}</p>
+              {period.practical.meta && <p class="entry-meta">{period.practical.meta}</p>}
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

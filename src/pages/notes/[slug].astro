@@ -1,0 +1,45 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import DocumentLayout from '../../layouts/DocumentLayout.astro';
+import { findTranslation, getNoteIdentity, visibleNotes } from '../../lib/content';
+import { localizedPath } from '../../lib/urls';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('notes');
+  return visibleNotes(entries, 'en').map(({ entry, identity }) => ({
+    params: { slug: identity.slug },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'notes'>;
+}
+
+const { entry } = Astro.props;
+const identity = getNoteIdentity(entry.id);
+
+if (!identity) {
+  throw new Error(`Invalid localized document filename: ${entry.id}`);
+}
+
+const allNotes = await getCollection('notes');
+const translation = findTranslation(allNotes, identity);
+const translationIdentity = translation ? getNoteIdentity(translation.id) : undefined;
+const translationHref = translationIdentity
+  ? localizedPath('zh', `/notes/${translationIdentity.slug}/`)
+  : undefined;
+const { Content, headings } = await render(entry);
+---
+
+<DocumentLayout
+  locale="en"
+  title={entry.data.title}
+  description={entry.data.description}
+  published={entry.data.published}
+  updated={entry.data.updated}
+  headings={headings}
+  translationHref={translationHref}
+>
+  <Content />
+</DocumentLayout>
