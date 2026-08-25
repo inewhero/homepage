@@ -2,6 +2,7 @@
 import type { MarkdownHeading } from 'astro';
 import 'katex/dist/katex.min.css';
 import { getDictionary } from '../i18n';
+import type { NavKey } from '../i18n/types';
 import type { Locale } from '../lib/content';
 import { localizedPath } from '../lib/urls';
 import BaseLayout from './BaseLayout.astro';
@@ -14,6 +15,16 @@ interface Props {
   updated?: Date | undefined;
   headings: MarkdownHeading[];
   translationHref?: string | undefined;
+  active?: NavKey | undefined;
+  backHref?: string | undefined;
+  backLabel?: string | undefined;
+  publishedLabel?: string | undefined;
+  updatedLabel?: string | undefined;
+  kind?: string | undefined;
+  kindLabel?: string | undefined;
+  authors?: string[] | undefined;
+  authorsLabel?: string | undefined;
+  tableOfContentsLabel?: string | undefined;
 }
 
 const {
@@ -24,8 +35,23 @@ const {
   updated,
   headings,
   translationHref,
+  active = 'notes',
+  backHref,
+  backLabel,
+  publishedLabel,
+  updatedLabel,
+  kind,
+  kindLabel,
+  authors,
+  authorsLabel,
+  tableOfContentsLabel,
 } = Astro.props;
 const copy = getDictionary(locale);
+const resolvedBackHref = backHref ?? localizedPath(locale, '/notes/');
+const resolvedBackLabel = backLabel ?? copy.notes.backToNotes;
+const resolvedPublishedLabel = publishedLabel ?? copy.notes.published;
+const resolvedUpdatedLabel = updatedLabel ?? copy.notes.updated;
+const resolvedTocLabel = tableOfContentsLabel ?? copy.notes.tableOfContents;
 const toc = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
 const dateFormatter = new Intl.DateTimeFormat(locale === 'zh' ? 'zh-CN' : 'en-US', {
   year: 'numeric',
@@ -38,42 +64,44 @@ const dateFormatter = new Intl.DateTimeFormat(locale === 'zh' ? 'zh-CN' : 'en-US
   locale={locale}
   title={title}
   description={description}
-  active="notes"
+  active={active}
   translationHref={translationHref}
-  pageClass="document-page"
+  pageClass={`document-page document-${active}-page`}
 >
   <header class="document-header section-frame">
-    <a class="back-link" href={localizedPath(locale, '/notes/')}>
-      <span aria-hidden="true">←</span> {copy.notes.backToNotes}
+    <a class="back-link" href={resolvedBackHref}>
+      <span aria-hidden="true">←</span> {resolvedBackLabel}
     </a>
     <h1>{title}</h1>
     <p class="document-description">{description}</p>
     <div class="document-meta">
       <p>
-        {copy.notes.published}
+        {resolvedPublishedLabel}
         <time datetime={published.toISOString()}>{dateFormatter.format(published)}</time>
       </p>
       {
         updated && (
           <p>
-            {copy.notes.updated}
+            {resolvedUpdatedLabel}
             <time datetime={updated.toISOString()}>{dateFormatter.format(updated)}</time>
           </p>
         )
       }
+      {kind && kindLabel && <p>{kindLabel}<span>{kind}</span></p>}
+      {authors && authorsLabel && <p>{authorsLabel}<span>{authors.join(', ')}</span></p>}
     </div>
   </header>
 
   <details class="mobile-toc section-frame">
-    <summary>{copy.notes.tableOfContents}</summary>
+    <summary>{resolvedTocLabel}</summary>
     <ol>
       {toc.map((heading) => <li class={`depth-${heading.depth}`}><a href={`#${heading.slug}`}>{heading.text}</a></li>)}
     </ol>
   </details>
 
   <div class="document-grid section-frame">
-    <aside class="desktop-toc" aria-label={copy.notes.tableOfContents}>
-      <p>{copy.notes.tableOfContents}</p>
+    <aside class="desktop-toc" aria-label={resolvedTocLabel}>
+      <p>{resolvedTocLabel}</p>
       <ol>
         {toc.map((heading) => <li class={`depth-${heading.depth}`}><a href={`#${heading.slug}`}>{heading.text}</a></li>)}
       </ol>

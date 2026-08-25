@@ -1,38 +1,33 @@
 ---
-title: "Attention Is More Than a Spotlight"
-description: "Revisiting a familiar metaphor to ask how attention selects, sustains, and shapes experience."
+title: "Attention beyond selection"
+description: "A short note on attention as selection, sustained regulation, and a problem of measurement across laboratory and everyday settings."
 published: 2026-08-06
+updated: 2026-08-25
 tags: ["attention", "cognitive neuroscience", "methods"]
 ---
 
-Attention is often described as a spotlight: it illuminates one object while allowing the surroundings to recede. The metaphor is intuitive, but it can hide a more consequential idea. Attention does not merely select information; it changes how information enters experience.
+Attention is often compared to a spotlight: one object comes into view while the rest of the scene recedes. The metaphor captures selection well, but leaves out time. Selected information must still be processed and maintained before it can enter experience or guide action.
 
-## Selection is only the beginning
+## Selection over time
 
-At any moment, sensory systems receive far more signals than we can report. One role of attention is to give a subset of those signals the opportunity for deeper processing. This selection is not always top-down. Sudden sounds, emotional cues, and prior experience can all redistribute limited processing resources.
+Sensory systems receive more information than we can report or act on at once. Attention gives some signals priority. Current goals help set that priority, while sudden events, emotional relevance, and prior learning can quickly rearrange it.
 
-### Selection unfolds over time
+Experimental tasks often compress this process into a single response. Everyday attention has no such clean boundary. It persists, falters, returns, and changes direction as fatigue, expectation, reward, and uncertainty shift over time.
 
-A single response is easy to measure in an experiment. Attention in everyday life must be sustained. It shifts with fatigue, expectation, reward, and uncertainty in the environment.
+## Laboratory and everyday settings
 
-## From the laboratory to daily life
+Laboratory tasks gain clarity by isolating variables, and lose much of the surrounding context in the process. Research outside the laboratory asks how much a mechanism identified under controlled conditions can still explain when tasks compete and environments change.
 
-Laboratory tasks are good at isolating variables, but they compress context. The value of real-world research is not simply greater complexity. It is the chance to test whether mechanisms found under controlled conditions can explain natural behavior.
-
-> A useful translational question is not only whether an effect replicates, but under which conditions it still matters.
+> Translational research must also ask: under which conditions does a replicable effect still matter for behaviour?
 
 ## Reproducible observation
 
-Connecting these settings requires transparent measurement. Cleaning rules, exclusion criteria, and analytical choices should remain traceable. Reproducibility is not housekeeping after a project; it is part of the observation itself.
+Comparing controlled and natural settings requires measurements that remain interpretable after data collection. Researchers need a record of cleaning rules, exclusion criteria, preprocessing choices, and analytical decisions. Reproducibility begins when the measurement is designed, rather than when the experiment is over.
 
-## What comes next
-
-Future notes will look more closely at ecological validity, individual differences, and lightweight ways to record cognitive states in daily life.
-
-## A compact representation
-
-For example, a slowly updated estimate of attention can be written as:
+A simple example is a slowly updated estimate of attentional state:
 
 $$
 A_t = \alpha S_t + (1-\alpha)A_{t-1}, \qquad 0 \le \alpha \le 1
 $$
+
+The equation does not define attention. It simply shows what follows when attention is treated as a state that changes over time: the measurement must account for the current signal and its recent history.

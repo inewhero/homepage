@@ -35,7 +35,7 @@ const journey = defineCollection({
 const sections = defineCollection({
   loader: glob({
     base: './src/content/sections',
-    pattern: '{projects,publications}_{zh,en}.md',
+    pattern: 'projects_{zh,en}.md',
     generateId: ({ entry }) => entry.replace(/\.md$/, ''),
   }),
   schema: z.object({
@@ -44,15 +44,39 @@ const sections = defineCollection({
   }),
 });
 
-const featured = defineCollection({
+const projects = defineCollection({
   loader: glob({
-    base: './src/content/home',
-    pattern: 'selected_works_{zh,en}.md',
+    base: './src/content/projects',
+    pattern: '**/*_{zh,en}.md',
     generateId: ({ entry }) => entry.replace(/\.md$/, ''),
   }),
   schema: z.object({
     title: z.string(),
+    summary: z.string(),
+    repository: z.url(),
+    order: z.number().int().nonnegative(),
+    selected: z.boolean().default(false),
+    draft: z.boolean().default(false),
   }),
 });
 
-export const collections = { notes, journey, sections, featured };
+const publications = defineCollection({
+  loader: glob({
+    base: './src/content/publications',
+    pattern: '**/*_{zh,en}.md',
+    generateId: ({ entry }) => entry.replace(/\.md$/, ''),
+  }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    date: z.coerce.date(),
+    updated: z.coerce.date().optional(),
+    type: z.string(),
+    authors: z.array(z.string()).min(1),
+    repository: z.url().optional(),
+    materials: z.url().optional(),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { notes, journey, sections, projects, publications };

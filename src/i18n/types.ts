@@ -8,9 +8,6 @@ export type NavKey =
   | 'journey'
   | 'contact';
 
-export type StandardPageKey = Exclude<NavKey, 'home' | 'notes' | 'journey'>;
-export type MarkdownSectionKey = Exclude<StandardPageKey, 'contact'>;
-
 export interface SectionItem {
   eyebrow?: string;
   title: string;
@@ -35,6 +32,7 @@ export interface SiteCopy {
     headline: string;
     subheadline: string;
     intro: string;
+    selectedTitle: string;
   };
   pages: {
     contact: {
@@ -51,6 +49,16 @@ export interface SiteCopy {
     updated: string;
     unavailable: string;
     backToNotes: string;
+  };
+  publications: {
+    indexTitle: string;
+    indexIntro: string;
+    tableOfContents: string;
+    date: string;
+    updated: string;
+    type: string;
+    authors: string;
+    backToPublications: string;
   };
   footer: {
     rights: string;

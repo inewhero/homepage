@@ -1,0 +1,61 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { getDictionary } from '../../i18n';
+import DocumentLayout from '../../layouts/DocumentLayout.astro';
+import {
+  findPublicationTranslation,
+  getPublicationIdentity,
+  visiblePublications,
+} from '../../lib/publications';
+import { localizedPath } from '../../lib/urls';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('publications');
+  return visiblePublications(entries, 'en').map(({ entry, identity }) => ({
+    params: { slug: identity.slug },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'publications'>;
+}
+
+const { entry } = Astro.props;
+const identity = getPublicationIdentity(entry.id);
+
+if (!identity) {
+  throw new Error(`Invalid localized publication filename: ${entry.id}`);
+}
+
+const copy = getDictionary('en');
+const allPublications = await getCollection('publications');
+const translation = findPublicationTranslation(allPublications, identity);
+const translationIdentity = translation ? getPublicationIdentity(translation.id) : undefined;
+const translationHref = translationIdentity
+  ? localizedPath('zh', `/publications/${translationIdentity.slug}/`)
+  : undefined;
+const { Content, headings } = await render(entry);
+---
+
+<DocumentLayout
+  locale="en"
+  title={entry.data.title}
+  description={entry.data.description}
+  published={entry.data.date}
+  updated={entry.data.updated}
+  headings={headings}
+  translationHref={translationHref}
+  active="publications"
+  backHref={localizedPath('en', '/publications/')}
+  backLabel={copy.publications.backToPublications}
+  publishedLabel={copy.publications.date}
+  updatedLabel={copy.publications.updated}
+  kind={entry.data.type}
+  kindLabel={copy.publications.type}
+  authors={entry.data.authors}
+  authorsLabel={copy.publications.authors}
+  tableOfContentsLabel={copy.publications.tableOfContents}
+>
+  <Content />
+</DocumentLayout>

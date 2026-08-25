@@ -10,8 +10,8 @@ export interface JourneyEntry {
 export interface JourneyPeriod {
   id: string;
   year: string;
-  academic: JourneyEntry;
-  practical: JourneyEntry;
+  academic?: JourneyEntry;
+  practical?: JourneyEntry;
 }
 
 const requiredColumns = [
@@ -43,6 +43,30 @@ function readRequiredCell(
     throw new Error(`${source}: row ${rowNumber} is missing “${column}”.`);
   }
   return value;
+}
+
+function readJourneyEntry(
+  row: Record<string, string>,
+  track: 'academic' | 'practical',
+  source: string,
+  rowNumber: number,
+) {
+  const title = row[`${track}_title`]?.trim();
+  const text = row[`${track}_text`]?.trim();
+  const meta = row[`${track}_meta`]?.trim();
+
+  if (!title && !text && !meta) return undefined;
+  if (!title || !text) {
+    throw new Error(
+      `${source}: row ${rowNumber} must provide both “${track}_title” and “${track}_text”.`,
+    );
+  }
+
+  return {
+    title,
+    text,
+    ...(meta ? { meta } : {}),
+  };
 }
 
 export function parseJourneyTable(body: string, source: string): JourneyPeriod[] {
@@ -91,22 +115,18 @@ export function parseJourneyTable(body: string, source: string): JourneyPeriod[]
     }
     seenIds.add(id);
 
-    const academicMeta = row.academic_meta?.trim();
-    const practicalMeta = row.practical_meta?.trim();
+    const academic = readJourneyEntry(row, 'academic', source, rowNumber);
+    const practical = readJourneyEntry(row, 'practical', source, rowNumber);
+
+    if (!academic && !practical) {
+      throw new Error(`${source}: row ${rowNumber} must include at least one Journey entry.`);
+    }
 
     return {
       id,
       year: readRequiredCell(row, 'year', source, rowNumber),
-      academic: {
-        title: readRequiredCell(row, 'academic_title', source, rowNumber),
-        text: readRequiredCell(row, 'academic_text', source, rowNumber),
-        ...(academicMeta ? { meta: academicMeta } : {}),
-      },
-      practical: {
-        title: readRequiredCell(row, 'practical_title', source, rowNumber),
-        text: readRequiredCell(row, 'practical_text', source, rowNumber),
-        ...(practicalMeta ? { meta: practicalMeta } : {}),
-      },
+      ...(academic ? { academic } : {}),
+      ...(practical ? { practical } : {}),
     };
   });
 }

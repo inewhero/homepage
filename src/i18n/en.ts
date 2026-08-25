@@ -25,6 +25,7 @@ export const en = {
     subheadline: 'Turning curiosity into real-world discovery.',
     intro:
       'I study how cognition process shapes mind and behavior, translating fundamental insights into practical advances that improve mental health and life quality.',
+    selectedTitle: 'Selected Works',
   },
   pages: {
     contact: {
@@ -35,7 +36,7 @@ export const en = {
         {
           eyebrow: 'Email',
           title: 'yosoro0814(at)gmail.com',
-          text: 'I am always glad to hear from fellow students, researchers, and anyone curious about these topics—whether you would like to exchange an idea, share an experience, or simply say hello.',
+          text: 'I welcome your thoughts and would be grateful for your advice.',
         },
         {
           eyebrow: 'GitHub',
@@ -61,6 +62,16 @@ export const en = {
     updated: 'Updated',
     unavailable: 'Translation unavailable',
     backToNotes: 'All notes',
+  },
+  publications: {
+    indexTitle: 'Publications',
+    indexIntro: 'Research writing, theses, manuscripts, and published work.',
+    tableOfContents: 'On this page',
+    date: 'Date',
+    updated: 'Updated',
+    type: 'Type',
+    authors: 'Authors',
+    backToPublications: 'All publications',
   },
   footer: {
     rights: 'Built with Astro and Markdown.',

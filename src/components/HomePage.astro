@@ -1,9 +1,11 @@
 ---
+import { getCollection } from 'astro:content';
 import { getDictionary } from '../i18n';
 import type { Locale } from '../lib/content';
-import { getFeaturedWorks } from '../lib/featured';
+import { visibleProjects } from '../lib/projects';
 import { localizedPath } from '../lib/urls';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import portraitUrl from '../../portrait.png?url';
 
 interface Props {
   locale: Locale;
@@ -12,7 +14,8 @@ interface Props {
 const { locale } = Astro.props;
 const copy = getDictionary(locale);
 const otherLocale: Locale = locale === 'zh' ? 'en' : 'zh';
-const featured = await getFeaturedWorks(locale);
+const projectEntries = await getCollection('projects');
+const selectedProjects = visibleProjects(projectEntries, locale).filter(({ entry }) => entry.data.selected);
 ---
 
 <BaseLayout
@@ -22,41 +25,46 @@ const featured = await getFeaturedWorks(locale);
   pageClass="home-page"
 >
   <section class="hero section-frame" aria-labelledby="hero-title">
-    <div class="hero-copy">
-      <h1 id="hero-title" class="hero-welcome">
-        <span class="hero-welcome-lead">{copy.home.welcomeBefore}</span>
-        <span class="hero-welcome-name"><strong>{copy.home.name}</strong>{copy.home.welcomeAfter}</span>
-      </h1>
-      <p class="hero-headline">{copy.home.headline}</p>
-      <p class="hero-subheadline">{copy.home.subheadline}</p>
-      <span class="accent-rule" aria-hidden="true"></span>
-      <p class="hero-intro">{copy.home.intro}</p>
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <h1 id="hero-title" class="hero-welcome">
+          <span class="hero-welcome-lead">{copy.home.welcomeBefore}</span>
+          <span class="hero-welcome-name"><strong>{copy.home.name}</strong>{copy.home.welcomeAfter}</span>
+        </h1>
+        <p class="hero-headline">{copy.home.headline}</p>
+        <p class="hero-subheadline">{copy.home.subheadline}</p>
+      </div>
+
+      <figure class="hero-portrait">
+        <img src={portraitUrl} alt={copy.home.name} width="1448" height="1086" loading="eager" decoding="async" />
+      </figure>
+
+      <div class="hero-intro-block">
+        <span class="accent-rule" aria-hidden="true"></span>
+        <p class="hero-intro">{copy.home.intro}</p>
+      </div>
     </div>
   </section>
 
   <section class="selected-work section-frame" aria-labelledby="selected-work-title">
     <div class="section-heading-row">
       <div>
-        <h2 id="selected-work-title">{featured.title}</h2>
+        <h2 id="selected-work-title">{copy.home.selectedTitle}</h2>
         <span class="sage-rule" aria-hidden="true"></span>
       </div>
     </div>
 
     <div class="work-grid">
       {
-        featured.items.map((work) => (
+        selectedProjects.map(({ entry, identity }) => (
           <article class="work-card">
-            <h3>{work.title}</h3>
+            <h3>{entry.data.title}</h3>
             <span class="card-rule" aria-hidden="true"></span>
-            <p class="work-meta">
-              <span>{work.year}</span>
-              <span aria-hidden="true">·</span>
-              <span>{work.venue}</span>
-            </p>
+            <p class="work-summary">{entry.data.summary}</p>
             <a
               class="card-link"
-              href={localizedPath(locale, work.href)}
-              aria-label={work.title}
+              href={localizedPath(locale, `/projects/#${identity.slug}`)}
+              aria-label={entry.data.title}
             />
           </article>
         ))

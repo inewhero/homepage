@@ -1,0 +1,55 @@
+---
+import { getCollection, render } from 'astro:content';
+import type { Locale } from '../lib/content';
+import { visibleProjects } from '../lib/projects';
+import { getProjectsPageMetadata } from '../lib/sections';
+import { localizedPath } from '../lib/urls';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const page = await getProjectsPageMetadata(locale);
+const entries = await getCollection('projects');
+const visible = visibleProjects(entries, locale);
+const projects = await Promise.all(
+  visible.map(async ({ entry, identity }) => ({
+    entry,
+    identity,
+    Content: (await render(entry)).Content,
+  })),
+);
+const otherLocale: Locale = locale === 'zh' ? 'en' : 'zh';
+---
+
+<BaseLayout
+  locale={locale}
+  active="projects"
+  title={page.title}
+  description={page.intro}
+  translationHref={localizedPath(otherLocale, '/projects/')}
+  pageClass="projects-page"
+>
+  <section class="page-hero compact-page-hero section-frame">
+    <h1>{page.title}</h1>
+  </section>
+
+  <section class="project-list section-frame" aria-label={page.title}>
+    {
+      projects.map(({ entry, identity, Content }) => (
+        <article class="project-entry" id={identity.slug}>
+          <h2>
+            <a href={entry.data.repository} target="_blank" rel="noreferrer">
+              {entry.data.title}
+            </a>
+          </h2>
+          <div class="project-copy">
+            <Content />
+          </div>
+        </article>
+      ))
+    }
+  </section>
+</BaseLayout>

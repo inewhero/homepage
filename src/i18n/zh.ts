@@ -24,6 +24,7 @@ export const zh = {
     subheadline: 'Turning curiosity into real-world discovery.',
     intro:
       '我研究认知加工如何塑造心智与行为，并尝试将基础发现转化为能够改善心理健康与生活质量的实践。',
+    selectedTitle: '代表工作',
   },
   pages: {
     contact: {
@@ -34,7 +35,7 @@ export const zh = {
         {
           eyebrow: '邮箱',
           title: 'yosoro0814(at)gmail.com',
-          text: '很欢迎同学、研究者，以及对这些话题感兴趣的朋友来信。无论是交流一个想法、分享一段经验，还是简单打个招呼，我都会很开心地读到。',
+          text: '欢迎来信交流，也期待您的指教。',
         },
         {
           eyebrow: 'GitHub',
@@ -59,6 +60,16 @@ export const zh = {
     updated: '更新于',
     unavailable: '暂无对应译文',
     backToNotes: '全部札记',
+  },
+  publications: {
+    indexTitle: '发表',
+    indexIntro: '研究论文、学位论文、手稿与正式发表成果。',
+    tableOfContents: '本页目录',
+    date: '日期',
+    updated: '更新于',
+    type: '类型',
+    authors: '作者',
+    backToPublications: '全部发表',
   },
   footer: {
     rights: '使用 Astro 与 Markdown 构建。',

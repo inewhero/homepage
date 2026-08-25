@@ -1,21 +1,17 @@
 ---
 import { getDictionary } from '../i18n';
-import type { StandardPageKey } from '../i18n/types';
 import type { Locale } from '../lib/content';
-import { getSectionContent } from '../lib/sections';
 import { localizedPath } from '../lib/urls';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 interface Props {
   locale: Locale;
-  section: StandardPageKey;
+  section: 'contact';
 }
 
 const { locale, section } = Astro.props;
 const copy = getDictionary(locale);
-const page = section === 'contact'
-  ? copy.pages.contact
-  : await getSectionContent(locale, section);
+const page = copy.pages.contact;
 const otherLocale: Locale = locale === 'zh' ? 'en' : 'zh';
 ---
 

@@ -1,0 +1,55 @@
+---
+import { getCollection } from 'astro:content';
+import { getDictionary } from '../i18n';
+import type { Locale } from '../lib/content';
+import { visiblePublications } from '../lib/publications';
+import { localizedPath } from '../lib/urls';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getDictionary(locale);
+const entries = await getCollection('publications');
+const publications = visiblePublications(entries, locale);
+const otherLocale: Locale = locale === 'zh' ? 'en' : 'zh';
+const yearFormatter = new Intl.DateTimeFormat(locale === 'zh' ? 'zh-CN' : 'en-US', {
+  year: 'numeric',
+});
+---
+
+<BaseLayout
+  locale={locale}
+  title={copy.publications.indexTitle}
+  description={copy.publications.indexIntro}
+  active="publications"
+  translationHref={localizedPath(otherLocale, '/publications/')}
+  pageClass="publications-index-page"
+>
+  <section class="page-hero compact-page-hero section-frame">
+    <h1>{copy.publications.indexTitle}</h1>
+  </section>
+
+  <section class="publication-list section-frame" aria-label={copy.publications.indexTitle}>
+    {
+      publications.map(({ entry, identity }) => (
+        <article class="publication-preview">
+          <div>
+            <h2>
+              <a href={localizedPath(locale, `/publications/${identity.slug}/`)}>
+                {entry.data.title}
+              </a>
+            </h2>
+            <p>{entry.data.description}</p>
+          </div>
+          <p class="publication-kind">
+            <span>{entry.data.type}</span>
+            <time datetime={entry.data.date.toISOString()}>{yearFormatter.format(entry.data.date)}</time>
+          </p>
+        </article>
+      ))
+    }
+  </section>
+</BaseLayout>

@@ -27,10 +27,11 @@ npm run preview
 src/
 ├─ components/       # 页面级与共享组件
 ├─ content/
-│  ├─ home/          # 首页代表工作
 │  ├─ journey/       # 双轨时间线
 │  ├─ notes/         # Markdown 札记
-│  └─ sections/      # Projects 与 Publications
+│  ├─ projects/      # 项目介绍与首页代表工作
+│  ├─ publications/  # 学位论文、手稿与正式发表成果
+│  └─ sections/      # 页面标题与 SEO 摘要
 ├─ i18n/             # 页面界面的中英文文案
 ├─ layouts/          # 基础页面与札记正文布局
 ├─ lib/              # 内容解析、校验与路由工具
@@ -46,7 +47,7 @@ src/
 - 英文页面文案：`src/i18n/en.ts`
 - 页面结构与视觉：`src/components/`、`src/styles/global.css`
 
-首页中的示例论文仍是待替换内容。姓名与联系邮箱在中英文字典中统一维护。
+姓名与联系邮箱在中英文字典中统一维护。
 
 ## 编辑 Journey
 
@@ -57,29 +58,70 @@ src/content/journey/journey_en.md
 src/content/journey/journey_zh.md
 ```
 
-页面标题与轨道名称写在 frontmatter 中；时间线通过 Markdown table 维护。每一行对应一个时间点，表头字段保持为 `id`、`year`、`academic_title`、`academic_text`、`academic_meta`、`practical_title`、`practical_text`、`practical_meta`。构建时会检查缺列、空白必填项、无效 id 与重复 id。
+页面标题与轨道名称写在 frontmatter 中；时间线通过 Markdown table 维护。每一行对应一个时间点，表头字段保持为 `id`、`year`、`academic_title`、`academic_text`、`academic_meta`、`practical_title`、`practical_text`、`practical_meta`。同一行可以只填写学术或实践一侧，但每个非空节点必须同时包含标题和正文。构建时会检查缺列、残缺节点、无效 id 与重复 id。
 
-## 编辑项目与发表
+## 编辑项目
 
-Projects 与 Publications 的双语内容保存在：
+Projects 页面标题与 SEO 摘要保存在：
 
 ```text
 src/content/sections/projects_en.md
 src/content/sections/projects_zh.md
-src/content/sections/publications_en.md
-src/content/sections/publications_zh.md
 ```
 
-页面标题与 SEO 摘要写在 frontmatter 中；列表通过 Markdown table 维护，字段为 `title`、`text`、`meta`、`href`。其中 `meta` 与 `href` 可以留空，构建时会校验表格结构与必填内容。
-
-首页 Selected Works 的双语内容保存在：
+每个项目的双语介绍分别保存在 `src/content/projects/`：
 
 ```text
-src/content/home/selected_works_en.md
-src/content/home/selected_works_zh.md
+project-name_en.md
+project-name_zh.md
 ```
 
-表格字段为 `title`、`year`、`venue`、`href`，构建时会检查所有字段是否完整。
+Frontmatter 中的 `order` 决定 Projects 页面顺序，`selected: true` 会将项目自动加入首页 Selected Works。`summary` 用于首页卡片，正文使用普通 Markdown 编写，可自然分成 1 至 3 段：
+
+```yaml
+---
+title: "Project Name"
+summary: "首页使用的简短说明"
+repository: "https://github.com/example/project"
+order: 10
+selected: true
+draft: false
+---
+```
+
+## 新增发表成果
+
+学位论文、手稿与正式发表成果保存在 `src/content/publications/`，文件名语言后缀与札记相同：
+
+```text
+work-title_en.md
+work-title_zh.md
+```
+
+两份文件的基础名称相同时会被识别为互译，并生成：
+
+```text
+/publications/work-title/       # English
+/zh/publications/work-title/    # 中文
+```
+
+成果日期、类型、作者和外部资源均由 Markdown frontmatter 控制：
+
+```yaml
+---
+title: "成果标题"
+description: "列表与 SEO 摘要"
+date: 2023-05-31
+updated: 2026-08-10 # 可选
+type: "本科毕业论文"
+authors: ["黄睿逸"]
+repository: "https://github.com/example/repository" # 可选
+materials: "https://doi.org/example" # 可选
+draft: false
+---
+```
+
+正文直接使用 Markdown 编写，支持表格与 LaTeX。
 
 ## 新增双语文档
 

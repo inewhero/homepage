@@ -36,24 +36,32 @@ const otherLocale: Locale = locale === 'zh' ? 'en' : 'zh';
       {
         journey.periods.map((period) => (
           <article class="journey-period" id={`period-${period.id}`}>
-            <div class="journey-entry journey-academic">
-              <p class="journey-track-label">{journey.academicLabel}</p>
-              <h2>{period.academic.title}</h2>
-              <p>{period.academic.text}</p>
-              {period.academic.meta && <p class="entry-meta">{period.academic.meta}</p>}
-            </div>
+            {
+              period.academic && (
+                <div class="journey-entry journey-academic">
+                  <p class="journey-track-label">{journey.academicLabel}</p>
+                  <h2>{period.academic.title}</h2>
+                  <p>{period.academic.text}</p>
+                  {period.academic.meta && <p class="entry-meta">{period.academic.meta}</p>}
+                </div>
+              )
+            }
 
             <div class="journey-axis" aria-label={period.year}>
               <span class="journey-dot" aria-hidden="true"></span>
               <time>{period.year}</time>
             </div>
 
-            <div class="journey-entry journey-practical">
-              <p class="journey-track-label">{journey.practicalLabel}</p>
-              <h2>{period.practical.title}</h2>
-              <p>{period.practical.text}</p>
-              {period.practical.meta && <p class="entry-meta">{period.practical.meta}</p>}
-            </div>
+            {
+              period.practical && (
+                <div class="journey-entry journey-practical">
+                  <p class="journey-track-label">{journey.practicalLabel}</p>
+                  <h2>{period.practical.title}</h2>
+                  <p>{period.practical.text}</p>
+                  {period.practical.meta && <p class="entry-meta">{period.practical.meta}</p>}
+                </div>
+              )
+            }
           </article>
         ))
       }

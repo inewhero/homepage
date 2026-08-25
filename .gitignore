@@ -9,3 +9,7 @@ src/assets/fonts/generated/
 src/styles/fonts.generated.css
 .DS_Store
 *.log
+*.psd
+.env
+.env.*
+!.env.example
