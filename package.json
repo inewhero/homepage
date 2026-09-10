@@ -15,8 +15,10 @@
     "@fontsource/lora": "5.3.0",
     "@fontsource/noto-serif-sc": "5.3.0",
     "@fontsource/source-sans-3": "5.3.0",
+    "@types/qrcode": "^1.5.6",
     "astro": "7.1.6",
     "katex": "0.18.1",
+    "qrcode": "^1.5.4",
     "rehype-katex": "7.0.1",
     "remark-math": "6.0.0"
   },

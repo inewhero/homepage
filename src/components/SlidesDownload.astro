@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import type { Locale } from '../lib/content';
+import { localizedPath, withBase } from '../lib/urls';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const zh = locale === 'zh';
+const title = zh ? 'CNS 2026 报告 PPT 下载' : 'CNS 2026 presentation slides';
+const file = withBase('/downloads/ruiyi-huang-cns2026-oral.pptx');
+---
+
+<BaseLayout locale={locale} title={title}
+  description={zh ? '扫码下载黄睿逸的 CNS 2026 口头报告 PPTX。' : 'Scan to download Ruiyi Huang’s CNS 2026 oral presentation PPTX.'}
+  translationHref={localizedPath(zh ? 'en' : 'zh', '/downloads/cns2026/')}>
+  <section class="page-hero compact-page-hero section-frame">
+    <h1>{title}</h1>
+    <p>Ruiyi Huang · {zh ? '口头报告' : 'Oral presentation'}</p>
+  </section>
+  <section class="download-panel section-frame" aria-label={zh ? '扫码下载' : 'Download slides'}>
+    <div class="qr-block">
+      <canvas id="slides-qr" role="img" aria-label={zh ? 'PPT 文件下载二维码' : 'QR code to download the PPTX'} hidden></canvas>
+      <p id="qr-status">{zh ? '正在生成下载二维码…' : 'Generating download QR code…'}</p>
+      <noscript><p>{zh ? '请启用 JavaScript 显示二维码，或使用下载按钮。' : 'Enable JavaScript for the QR code, or use the download button.'}</p></noscript>
+    </div>
+    <div class="download-info">
+      <h2>{zh ? '扫码下载 PPT' : 'Scan to download'}</h2>
+      <p>{zh ? '使用手机相机扫描二维码，下载原始演示文稿。' : 'Scan the QR code with your phone camera to download the original presentation.'}</p>
+      <p class="file-details">Ruiyi Huang CNS2026 Oral.pptx<br />PPTX · 74.5 MB</p>
+      <a id="slides-download" class="download-button" href={file} download="Ruiyi Huang CNS2026 Oral.pptx">{zh ? '直接下载 PPTX ↓' : 'Download PPTX ↓'}</a>
+      <p class="download-help">{zh ? '如在微信内无法下载，请在系统浏览器中打开此页。' : 'If downloading in WeChat fails, open this page in your browser.'}</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import QRCode from 'qrcode';
+  const link = document.querySelector<HTMLAnchorElement>('#slides-download');
+  const canvas = document.querySelector<HTMLCanvasElement>('#slides-qr');
+  const status = document.querySelector<HTMLElement>('#qr-status');
+  if (link && canvas && status) {
+    QRCode.toCanvas(canvas, link.href, { width: 280, margin: 4, errorCorrectionLevel: 'M' })
+      .then(() => { canvas.hidden = false; status.hidden = true; })
+      .catch(() => { status.textContent = document.documentElement.lang.startsWith('zh') ? '二维码加载失败，请使用下载按钮。' : 'QR code unavailable. Please use the download button.'; });
+  }
+</script>
+
+<style>
+  .download-panel { display: grid; gap: 2rem; padding-top: 2.5rem; padding-bottom: 4rem; align-items: center; }
+  .qr-block { width: min(100%, 280px); }
+  canvas { max-width: 100%; height: auto !important; }
+  .download-info { max-width: 34rem; }
+  .download-info h2 { font-size: 1.6rem; }
+  .file-details { overflow-wrap: anywhere; color: var(--muted); }
+  .download-button { display: inline-block; padding: 0.75rem 1.25rem; border: 1px solid var(--sage); border-radius: 0.25rem; text-decoration: none; }
+  .download-button:hover { background: white; }
+  .download-help { margin-top: 1rem; font-size: 0.9rem; color: var(--muted); }
+  @media (min-width: 48rem) { .download-panel { grid-template-columns: 280px minmax(0, 1fr); gap: 3rem; } }
+</style>

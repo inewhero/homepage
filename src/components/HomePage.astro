@@ -33,6 +33,9 @@ const selectedProjects = visibleProjects(projectEntries, locale).filter(({ entry
         </h1>
         <p class="hero-headline">{copy.home.headline}</p>
         <p class="hero-subheadline">{copy.home.subheadline}</p>
+        <p class="slides-entry"><a href={localizedPath(locale, '/downloads/cns2026/')}>
+          {locale === 'zh' ? 'CNS 2026 口头报告 · 扫码下载 PPT →' : 'CNS 2026 oral presentation · Download slides →'}
+        </a></p>
       </div>
 
       <figure class="hero-portrait">
@@ -55,6 +58,12 @@ const selectedProjects = visibleProjects(projectEntries, locale).filter(({ entry
     </div>
 
     <div class="work-grid">
+      <article class="work-card">
+        <h3>CNS 2026 · {locale === 'zh' ? '口头报告' : 'Oral presentation'}</h3>
+        <span class="card-rule" aria-hidden="true"></span>
+        <p class="work-summary">{locale === 'zh' ? '黄睿逸的会议报告幻灯片。点击进入扫码下载页，获取原始 PPTX 文件。' : 'Presentation slides by Ruiyi Huang. Open the download page to scan the QR code and get the original PPTX.'}</p>
+        <a class="card-link" href={localizedPath(locale, '/downloads/cns2026/')} aria-label={locale === 'zh' ? '下载 CNS 2026 报告 PPT' : 'Download CNS 2026 slides'} />
+      </article>
       {
         selectedProjects.map(({ entry, identity }) => (
           <article class="work-card">
@@ -72,3 +81,8 @@ const selectedProjects = visibleProjects(projectEntries, locale).filter(({ entry
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  .slides-entry { margin: 1.25rem 0 0; font-size: 1rem; }
+  .slides-entry a { text-decoration: underline; text-underline-offset: 0.25em; }
+</style>
