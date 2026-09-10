@@ -11,5 +11,7 @@ src/styles/fonts.generated.css
 *.log
 *.psd
 .env
+.wrangler/
+.dev.vars*
 .env.*
 !.env.example

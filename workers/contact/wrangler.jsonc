@@ -1,0 +1,21 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "homepage-contact",
+  "account_id": "1d20dcd11d2235812e8c1e36d8ba5bfd",
+  "main": "index.js",
+  "compatibility_date": "2026-09-10",
+  "workers_dev": true,
+  "preview_urls": false,
+  "vars": { "ALLOWED_ORIGIN": "https://inewhero.github.io" },
+  "d1_databases": [{
+    "binding": "DB",
+    "database_name": "homepage-contact",
+    "database_id": "be85410c-9a7c-40ee-bb8b-828570ec4a95",
+    "migrations_dir": "migrations"
+  }],
+  "ratelimits": [{
+    "name": "CONTACT_LIMITER",
+    "namespace_id": "10012026",
+    "simple": { "limit": 5, "period": 60 }
+  }]
+}

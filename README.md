@@ -154,7 +154,31 @@ draft: false
 
 如果只存在一种语言，语言切换会显示为不可用，不会伪造回退内容。
 
-## GitHub Pages
+## Contact 私密留言
+
+中英文 Contact 使用 `src/components/ContactForm.astro`，公开端点及 Turnstile sitekey 在 `src/lib/contact.ts`。前端仍部署到 GitHub Pages；后端为 Cloudflare Worker `homepage-contact`，数据库为同名 D1（APAC）。使用免费套餐，无邮件通知。
+
+在 Cloudflare 控制台进入 **Storage & databases → D1 → homepage-contact → Console** 查看留言：
+
+```sql
+SELECT id, created_at, name, email, message, locale, status
+FROM messages ORDER BY created_at DESC LIMIT 100;
+```
+
+可按具体 ID 将 `status` 更新为 `read` 或 `archived`。留言没有公开读取接口；查看与管理依赖 Cloudflare 账户授权。数据库不存访客 IP；IP 仅用于 Turnstile 校验与每分钟 5 次的边缘限流（非全局精确配额）。
+
+后端维护命令（先 `npx wrangler login`）：
+
+```bash
+node --test workers/contact/contact.test.mjs
+npx wrangler d1 migrations apply homepage-contact --remote --config workers/contact/wrangler.jsonc
+npx wrangler deploy --config workers/contact/wrangler.jsonc
+npx wrangler secret put TURNSTILE_SECRET --config workers/contact/wrangler.jsonc
+```
+
+`TURNSTILE_SECRET` 仅保存在 Worker Secret，不得放入公开配置。Turnstile 使用 Managed 模式，允许域名 `inewhero.github.io`，服务端校验 hostname、action 与 token。更换域名时同时更新 Worker 的 `ALLOWED_ORIGIN` 和 Turnstile 允许域名。后端部署独立于 GitHub Pages，需要修改后运行上述 deploy 命令。
+
+## GitHub Pages 部署
 
 `.github/workflows/deploy.yml` 使用 Astro 官方 Action。推送到 `main` 后，在仓库 **Settings → Pages** 中选择 **GitHub Actions** 作为 Source。
 

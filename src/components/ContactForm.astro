@@ -1,0 +1,85 @@
+---
+import type { Locale } from '../lib/content';
+import { contact } from '../lib/contact';
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const zh = locale === 'zh';
+---
+<section class="message-section section-frame" aria-labelledby="message-title">
+  <h2 id="message-title">{zh ? '快速留言' : 'Leave a message'}</h2>
+  <p>{zh ? '欢迎交流想法或提出建议。留言仅我可见；如需回复，请留下邮箱。' : 'Ideas, questions, and suggestions are welcome. Messages are private; leave your email if you would like a reply.'}</p>
+  <form id="contact-form" data-endpoint={contact.endpoint} data-locale={locale}>
+    <div class="field-row">
+      <label>{zh ? '称呼（选填）' : 'Name (optional)'}<input name="name" maxlength="100" autocomplete="name" /></label>
+      <label>{zh ? '邮箱（选填）' : 'Email (optional)'}<input type="email" name="email" maxlength="254" autocomplete="email" /></label>
+    </div>
+    <label>{zh ? '留言内容' : 'Message'}<textarea name="message" required maxlength="3000" rows="6" aria-describedby="message-limit"></textarea></label>
+    <p id="message-limit" class="form-note">{zh ? '最多 3000 字。留言及所填联系方式存储于 Cloudflare，用于阅读和回复。' : 'Up to 3,000 characters. Your message and contact details are stored in Cloudflare for reading and responding.'}</p>
+    <div class="honeypot" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off" /></label></div>
+    <div class="cf-turnstile" data-sitekey={contact.sitekey} data-action="contact" data-theme="light" data-language={zh ? 'zh-cn' : 'en'} data-size="flexible"></div>
+    <button type="submit" disabled>{zh ? '发送留言' : 'Send message'}</button>
+    <p id="contact-status" role="status" aria-live="polite"></p>
+    <noscript>{zh ? '发送留言需要启用 JavaScript，也可通过下方邮箱联系。' : 'Enable JavaScript to send a message, or contact me by email below.'}</noscript>
+  </form>
+</section>
+<script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script>
+  const form = document.querySelector<HTMLFormElement>('#contact-form');
+  if (form) {
+    const button = form.querySelector<HTMLButtonElement>('button')!;
+    const status = form.querySelector<HTMLElement>('#contact-status')!;
+    const zh = form.dataset.locale === 'zh';
+    const idle = zh ? '发送留言' : 'Send message';
+    button.disabled = !form.dataset.endpoint;
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (button.disabled) return;
+      const values = new FormData(form);
+      const token = String(values.get('cf-turnstile-response') ?? '');
+      if (!token) { status.textContent = zh ? '请先完成下方验证。如验证未出现，请刷新页面或使用邮箱联系。' : 'Please complete the verification. If it does not appear, reload or contact me by email.'; return; }
+      button.disabled = true;
+      button.textContent = zh ? '正在发送…' : 'Sending…';
+      status.textContent = '';
+      try {
+        const response = await fetch(form.dataset.endpoint!, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(20000),
+          body: JSON.stringify({ name: String(values.get('name') ?? '').trim(), email: String(values.get('email') ?? '').trim(), message: values.get('message'), website: values.get('website'), locale: form.dataset.locale, token }),
+        });
+        const result = await response.json();
+        if (response.status === 201 && result.ok) {
+          form.reset();
+          status.textContent = zh ? '留言已收到，谢谢你的来信！' : 'Message received. Thank you for getting in touch!';
+        } else if (response.status === 429) {
+          status.textContent = zh ? '发送过于频繁，请稍等一分钟后重试。' : 'Too many attempts. Please wait a minute and try again.';
+        } else if (result.code === 'verification') {
+          status.textContent = zh ? '验证已过期或未通过，请重新验证后发送。' : 'Verification expired or failed. Please verify again.';
+        } else { throw new Error('submit'); }
+      } catch {
+        status.textContent = zh ? '暂时无法确认发送结果，内容已保留。请稍后重试，或通过邮箱联系。' : 'Could not confirm delivery. Your text is preserved. Please retry later or contact me by email.';
+      } finally {
+        const turnstile = (window as Window & { turnstile?: { reset: () => void } }).turnstile;
+        turnstile?.reset();
+        button.disabled = false;
+        button.textContent = idle;
+      }
+    });
+  }
+</script>
+<style>
+  .message-section { padding-top: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--line); }
+  .message-section > p, form { max-width: 42rem; }
+  h2 { font-size: 1.65rem; }
+  form { display: grid; gap: 1rem; margin-top: 1.5rem; }
+  .field-row { display: grid; gap: 1rem; }
+  label { display: grid; gap: 0.4rem; }
+  input, textarea { box-sizing: border-box; width: 100%; min-width: 0; padding: 0.7rem 0.8rem; border: 1px solid var(--line-strong); border-radius: 0.25rem; background: rgba(255,255,255,.45); color: var(--ink); font: inherit; }
+  textarea { resize: vertical; }
+  input:focus-visible, textarea:focus-visible, button:focus-visible { outline: 2px solid var(--sage); outline-offset: 3px; }
+  button { justify-self: start; padding: 0.7rem 1.4rem; font: inherit; border: 1px solid var(--sage); background: transparent; color: inherit; border-radius: 0.25rem; cursor: pointer; }
+  button:disabled { opacity: 0.55; cursor: wait; }
+  button:hover:enabled { background: white; }
+  .form-note { font-size: 0.85rem; color: var(--muted); margin: 0; }
+  #contact-status { margin: 0; min-height: 1.5em; }
+  .honeypot { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+  @media(min-width: 40rem) { .field-row { grid-template-columns: 1fr 1fr; } }
+</style>

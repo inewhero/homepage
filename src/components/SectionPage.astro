@@ -3,6 +3,7 @@ import { getDictionary } from '../i18n';
 import type { Locale } from '../lib/content';
 import { localizedPath } from '../lib/urls';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ContactForm from './ContactForm.astro';
 
 interface Props {
   locale: Locale;
@@ -27,6 +28,7 @@ const otherLocale: Locale = locale === 'zh' ? 'en' : 'zh';
     <h1>{page.title}</h1>
   </section>
 
+  <ContactForm locale={locale} />
   <section class="entry-list section-frame">
     {
       page.items.map((item) => (
